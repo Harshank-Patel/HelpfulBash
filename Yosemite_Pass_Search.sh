@@ -1,8 +1,6 @@
 #!/bin/bash
 
 URL='https://www.recreation.gov/api/timedentry/availability/facility/10086745/monthlyAvailabilitySummaryView?year=2024&month=10&inventoryBucket=FIT&tourID=10086746'
-AUTH_TOKEN='Bearer <Insert here>'
-
 
 while true
 do
@@ -10,9 +8,7 @@ do
   response=$(curl -s "$URL" \
     -H "accept: */*" \
     -H "accept-language: en-US,en;q=0.9" \
-    -H "cookie: _gcl_au=1.1.386770688.1726324891; _ga=GA1.1.490907295.1726324891" \
     -H "priority: u=1, i" \
-    -H "authorization: $AUTH_TOKEN" \
     -H "referer: https://www.recreation.gov/timed-entry/10086745/ticket/10086746" \
     -H "sec-ch-ua-mobile: ?0" \
     -H "sec-fetch-dest: empty" \
@@ -24,7 +20,7 @@ do
   available=$(echo $response | jq -r '
     .facility_availability_summary_view_by_local_date
     | to_entries[]
-    | select(.value.tour_availability_summary_view_by_tour_id["10086746"].has_not_yet_released == false and .value.tour_availability_summary_view_by_tour_id["10086746"].has_reservable == true)
+    | select(.value.tour_availability_summary_view_by_tour_id["10086746"].has_not_yet_released == true and .value.tour_availability_summary_view_by_tour_id["10086746"].has_reservable == true)
     | select(.value.tour_availability_summary_view_by_tour_id["10086746"].available_times != [])
     | "Date:  \(.key):     Available Number : \(.value.tour_availability_summary_view_by_tour_id["10086746"].available_times | join(", "))"
   ')
